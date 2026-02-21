@@ -18,16 +18,16 @@ export class User extends BaseEntity {
     password: string;
 
     @Column({ type: 'boolean', default: true })
-    isActive: boolean;
+    isActive: boolean = true;
 
     @Column({ type: 'boolean', default: false })
-    isVerified: boolean;
+    isVerified: boolean = false;
 
     @Column({ length: 50, nullable: true })
-    registrationIp: string | null;
+    registrationIp: string | null = null;
 
-    @Column({ length: 500, nullable: true })
-    avatarUrl: string | null;
+    @Column({ length: 600, nullable: true })
+    avatarUrl: string | null = null;
 
     @Column({ length: 500, nullable: true })
     refreshToken: string | null;
