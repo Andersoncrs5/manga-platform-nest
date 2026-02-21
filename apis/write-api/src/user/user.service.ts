@@ -1,31 +1,53 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserRepository } from './UserRepository';
+import {Injectable, NotFoundException} from '@nestjs/common';
+import {CreateUserDto} from './dto/create-user.dto';
+import {UpdateUserDto} from './dto/update-user.dto';
+import {UserRepository} from './user.repository';
+import {User} from "./entities/user.entity";
+import {CryptoService} from "../utils/service/crypto/CryptoService";
 
 @Injectable()
 export class UserService {
   constructor(
-    private readonly repository: UserRepository
+    private readonly repository: UserRepository,
+    private readonly crypto: CryptoService,
   ){}
   
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  async create(dto: CreateUserDto) {
+    const user = new User()
+
+    user.name = dto.name;
+    user.username = dto.username;
+    user.email = dto.email;
+    user.password = await this.crypto.encoder(dto.password);
+
+    return await this.repository.save(user);
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findOneById(id: string): Promise<User | null> {
+    return await this.repository.findById(id)
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOneByIdSimple(id: string): Promise<User> {
+    const user: User | null = await this.repository.findById(id);
+
+    if (!user) throw new NotFoundException("User not found");
+
+    return user
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
+  async existsByEmail(email: string): Promise<boolean> {
+    return this.repository.existsByEmail(email);
+  }
+
+  async existsByUsername(username: string): Promise<boolean> {
+    return this.repository.existsByUsername(username);
+  }
+
+  update(id: string, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    await this.repository.delete(id)
   }
 }
