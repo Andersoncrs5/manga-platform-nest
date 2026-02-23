@@ -1,8 +1,8 @@
-import {DeepPartial, FindOptionsWhere, Repository} from "typeorm";
+import {DeepPartial, FindOptionsWhere, QueryDeepPartialEntity, Repository} from "typeorm";
 import {BaseEntity} from "./BaseEntity";
 
 export abstract class BaseRepository<T extends BaseEntity> {
-    constructor(protected readonly repository: Repository<T>) {}
+    protected constructor(protected readonly repository: Repository<T>) {}
 
     async findById(id: any): Promise<T | null> {
         return await this.repository.findOne({
@@ -34,5 +34,17 @@ export abstract class BaseRepository<T extends BaseEntity> {
 
     async clearTable(): Promise<void> {
         await this.repository.clear();
+    }
+
+    async saveMany(data: DeepPartial<T>[]): Promise<T[]> {
+        return await this.repository.save(data);
+    }
+
+    async update(id: any, data: QueryDeepPartialEntity<T>): Promise<void> {
+        await this.repository.update(id, data);
+    }
+
+    getBuilder(alias: string) {
+        return this.repository.createQueryBuilder(alias);
     }
 }
