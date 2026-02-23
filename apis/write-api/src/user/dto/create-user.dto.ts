@@ -18,7 +18,6 @@ export class CreateUserDto {
     @Length(1, 100, { message: "The max length of name is 100 and min is 1" })
     @Transform(({ value }) => sanitizeHtml(value))
     @ApiProperty({ default: "user" })
-    @IsUniqueUsername({ message: 'Username already exists' })
     username: string;
 
     @IsString({ message: "The field email should be a string" })
@@ -29,7 +28,6 @@ export class CreateUserDto {
     @Transform(({ value }) => value.toLowerCase() )
     @Transform(({ value }) => sanitizeHtml(value))
     @ApiProperty({ default: "user@example.com" })
-    @IsUniqueEmail({ message: 'Email already exists' })
     email: string;
 
     @IsString({ message: "The field password should be a string" })
