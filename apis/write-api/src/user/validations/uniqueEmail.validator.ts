@@ -6,7 +6,7 @@ import {
     ValidatorConstraintInterface,
     ValidationArguments,
 } from 'class-validator';
-import { UserRepository } from '../../user/user.repository';
+import { UserRepository } from '../user.repository';
 
 @ValidatorConstraint({ name: 'UniqueEmail', async: true })
 @Injectable()
