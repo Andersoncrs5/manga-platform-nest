@@ -1,9 +1,11 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
+import {ConflictException, Injectable, InternalServerErrorException, NotFoundException} from '@nestjs/common';
 import {CreateUserDto} from './dto/create-user.dto';
 import {UpdateUserDto} from './dto/update-user.dto';
 import {UserRepository} from './user.repository';
 import {User} from "./entities/user.entity";
 import {CryptoService} from "../utils/service/crypto/CryptoService";
+import {QueryFailedError} from "typeorm";
+import {UniqueConstraintViolationException} from "../utils/exceptions/classes/unique-constraint-violation.exception";
 
 @Injectable()
 export class UserService {
@@ -12,7 +14,7 @@ export class UserService {
     private readonly crypto: CryptoService,
   ){}
   
-  async create(dto: CreateUserDto) {
+  async create(dto: CreateUserDto): Promise<User> {
     const user = new User()
 
     user.name = dto.name;
@@ -20,7 +22,25 @@ export class UserService {
     user.email = dto.email;
     user.password = await this.crypto.encoder(dto.password);
 
-    return await this.repository.save(user);
+    try {
+      return await this.repository.save(user);
+    } catch (error) {
+      if (error instanceof QueryFailedError && (error as any).errno === 1062) {
+        const message = error.message;
+
+        if (message.includes('idx_username')) {
+          throw new UniqueConstraintViolationException('username', dto.username);
+        }
+
+        if (message.includes('idx_email')) {
+          throw new UniqueConstraintViolationException('email', dto.email);
+        }
+
+        throw new ConflictException('Duplicate data detected.');
+      }
+
+      throw new InternalServerErrorException('Error creating user.');
+    }
   }
 
   async findOneById(id: string): Promise<User | null> {
@@ -43,8 +63,30 @@ export class UserService {
     return this.repository.existsByUsername(username);
   }
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(user: User, dto: UpdateUserDto) {
+    user.username = dto.username ?? user.username;
+    user.name = dto.name ?? user.name;
+    user.avatarUrl = dto.avatarUrl ?? user.avatarUrl;
+
+    if (dto.password != null) {
+      user.password = await this.crypto.encoder(dto.password);
+    }
+
+    try {
+      return await this.repository.save(user);
+    } catch (error) {
+      if (error instanceof QueryFailedError && (error as any).errno === 1062) {
+        const message = error.message;
+
+        if (message.includes('idx_username')) {
+          throw new UniqueConstraintViolationException('username', dto.username);
+        }
+
+        throw new ConflictException('Duplicate data detected.');
+      }
+
+      throw new InternalServerErrorException('Error updating user.');
+    }
   }
 
   async remove(id: string) {
