@@ -1,34 +1,34 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import {UserDto} from "./dto/user.dto";
+import {Transactional} from "typeorm-transactional";
 
-@Controller('user')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+  @Controller('v1/user')
+  export class UserController {
+    constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
-  }
+    @Post()
+    @Transactional()
+    async create(@Body() createUserDto: CreateUserDto) {
+      const userCreated = await this.userService.create(createUserDto);
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
+      const userDto: UserDto = { ...userCreated };
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
-  }
+      return userDto;
+    }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Transactional()
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    const newVar = await this.userService.findOneByIdSimple(id);
+    return this.userService.update(newVar, updateUserDto);
   }
 
   @Delete(':id')
+  @Transactional()
   remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+    return this.userService.remove(id);
   }
 }
