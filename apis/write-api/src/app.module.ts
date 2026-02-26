@@ -5,6 +5,8 @@ import { DataSource } from 'typeorm';
 import {addTransactionalDataSource, getDataSourceByName} from 'typeorm-transactional';
 import { User } from './user/entities/user.entity';
 import {UserModule} from "./user/user.module";
+import { AuthModule } from './auth/auth.module';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -39,6 +41,8 @@ import {UserModule} from "./user/user.module";
       },
     }),
     UserModule,
+    AuthModule,
+    RoleModule,
   ],
 })
 export class AppModule {}
