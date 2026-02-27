@@ -1,5 +1,6 @@
 import { BaseEntity } from "../../utils/BaseEntity";
-import { Column, Entity, Index } from "typeorm";
+import {Column, Entity, Index, OneToMany} from "typeorm";
+import {UserRole} from "../../user-role/entities/user-role.entity";
 
 @Entity('users')
 @Index('idx_username', ['username'])
@@ -37,4 +38,7 @@ export class User extends BaseEntity {
 
     @Column({ type: 'smallint', default: 0 })
     attemptsLoginFailed: number;
+
+    @OneToMany(() => UserRole, (userRole) => userRole.user)
+    userRoles: UserRole[];
 }

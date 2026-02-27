@@ -1,5 +1,6 @@
 import {BaseEntity} from "../../utils/BaseEntity";
-import {Column, Entity, Index} from "typeorm";
+import {Column, Entity, Index, OneToMany} from "typeorm";
+import {UserRole} from "../../user-role/entities/user-role.entity";
 
 @Entity('roles')
 @Index('idx_role_name', ['name'])
@@ -26,4 +27,7 @@ export class Role extends BaseEntity {
         nullable: false,
     })
     isActive: boolean = true;
+
+    @OneToMany(() => UserRole, (userRole) => userRole.role)
+    userRoles: UserRole[];
 }
