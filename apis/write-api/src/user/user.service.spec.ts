@@ -29,7 +29,8 @@ describe('UserService', () => {
     username: 'John Doe',
     name: 'John Doe',
     email: "jonhDoe@gmail.com",
-    password: '12345678'
+    password: '12345678',
+    userRoles: []
   };
 
   const dto: CreateUserDto = {
@@ -78,7 +79,7 @@ describe('UserService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('update', () => {
+  describe('update', () =>  {
     const updateUserDto: UpdateUserDto = {
       username: 'new_username',
       name: 'New Name',
