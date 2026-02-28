@@ -12,5 +12,6 @@ import {Role} from "./entities/role.entity";
     RoleService,
     RoleRepository
   ],
+  exports: [RoleService],
 })
 export class RoleModule {}
