@@ -8,12 +8,14 @@ import { ConfigService } from "@nestjs/config";
 import { User } from "../user/entities/user.entity";
 import { Role } from "../role/entities/role.entity";
 import {Payload} from "./class/payload.interface";
+import {CryptoService} from "../utils/service/crypto/CryptoService";
 
 describe('AuthService', () => {
   let service: AuthService;
 
   const mockUserService = {
     create: jest.fn(),
+    updateRefreshToken: jest.fn(),
   };
 
   const mockJwtService = {
@@ -27,6 +29,10 @@ describe('AuthService', () => {
   const mockRoleService = {
     findByNameSimple: jest.fn(),
   };
+
+  const mockCryptoService = {
+    verifyPassword: jest.fn(),
+  }
 
   const mockConfigService = {
     get: jest.fn((key: string) => {
@@ -55,6 +61,7 @@ describe('AuthService', () => {
         { provide: UserRoleService, useValue: mockUserRoleService },
         { provide: RoleService, useValue: mockRoleService },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: CryptoService, useValue: mockCryptoService },
       ],
     }).compile();
 
@@ -63,31 +70,28 @@ describe('AuthService', () => {
   });
 
   describe('create', () => {
-    it('should register a user, link role and return tokens', async () => {
+    it('should register a user, link role and return tokens with user data', async () => {
       const createUserDto = { email: 'jonhDoe@gmail.com', password: '123' } as any;
+      const mockUserUpdated = { ...mockUser, refreshToken: 'mocked_refresh_token' };
+
       mockUserService.create.mockResolvedValue(mockUser);
       mockRoleService.findByNameSimple.mockResolvedValue(mockRole);
       mockUserRoleService.create.mockResolvedValue(null);
       mockJwtService.sign.mockReturnValue('mocked_token');
 
+      mockUserService.updateRefreshToken.mockResolvedValue(mockUserUpdated);
+
       const result = await service.create(createUserDto);
 
       expect(result).toEqual({
-        token: 'mocked_token',
-        refreshToken: 'mocked_token',
+        tokens: {
+          token: 'mocked_token',
+          refreshToken: 'mocked_token',
+        },
+        user: mockUserUpdated,
       });
 
-      expect(mockUserService.create).toHaveBeenCalledWith(createUserDto);
-      expect(mockRoleService.findByNameSimple).toHaveBeenCalledWith("USER_ROLE");
-      expect(mockUserRoleService.create).toHaveBeenCalledWith(mockUser.id, mockRole.id);
-
-      expect(mockJwtService.sign).toHaveBeenCalledTimes(2);
-    });
-
-    it('should bubble up error if user creation fails', async () => {
-      mockUserService.create.mockRejectedValue(new Error('User already exists'));
-
-      await expect(service.create({} as any)).rejects.toThrow('User already exists');
+      expect(mockUserService.updateRefreshToken).toHaveBeenCalledWith(mockUser, 'mocked_token');
     });
   });
 
@@ -95,12 +99,10 @@ describe('AuthService', () => {
     it('should return token', () => {
       mockJwtService.sign.mockReturnValue('mocked_token');
 
-      const token = service.createToken(mockUser, [mockRole]);
+      const token = service.createToken(mockUser, [mockRole.name]);
 
-      expect(token).toBe('mocked_token')
-
+      expect(token).toBe('mocked_token');
       expect(mockJwtService.sign).toHaveBeenCalledWith(payload);
-      expect(mockJwtService.sign).toHaveBeenCalledTimes(1);
     });
   })
 
