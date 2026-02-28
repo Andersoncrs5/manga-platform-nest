@@ -9,9 +9,11 @@ services:
       - --advertise-client-urls=http://pd:2379
       - --advertise-peer-urls=http://pd:2380
       - --initial-cluster=pd1=http://pd:2380
-      - --data-dir=/data/pd # Importante para persistência
+      - --data-dir=/data
     ports:
       - "2379:2379"
+    volumes:
+      - pd_data:/data
     networks:
       - manga-platform
 
@@ -22,7 +24,9 @@ services:
       - --pd=pd:2379
       - --addr=0.0.0.0:20160
       - --advertise-addr=tikv:20160
-      - --data-dir=/data/tikv
+      - --data-dir=/data
+    volumes:
+      - tikv_data:/data
     depends_on:
       - pd
     networks:
@@ -41,6 +45,29 @@ services:
     networks:
       - manga-platform
 
+  dragonfly:
+    container_name: dragonfly-manga-platform
+    image: 'docker.dragonflydb.io/dragonflydb/dragonfly'
+    # Adicionei o --bind para garantir que ele escute na rede do docker
+    command: ["dragonfly", "--logtostderr", "--dir", "/data", "--bind", "0.0.0.0"]
+    ulimits:
+      memlock: -1
+      nofile:
+        soft: 65535
+        hard: 65535
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - dragonfly_data:/data
+    networks:
+      - manga-platform
+
 networks:
   manga-platform:
     driver: bridge
+
+volumes:
+  pd_data:
+  tikv_data:
+  dragonfly_data:
