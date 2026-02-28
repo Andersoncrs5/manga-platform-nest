@@ -3,7 +3,6 @@ import {Column, Entity, Index, OneToMany} from "typeorm";
 import {UserRole} from "../../user-role/entities/user-role.entity";
 
 @Entity('roles')
-@Index('idx_role_name', ['name'])
 export class Role extends BaseEntity {
     @Column({
         type: 'varchar',
@@ -12,6 +11,7 @@ export class Role extends BaseEntity {
         unique: true,
         name: 'name'
     })
+    @Index('idx_role_name', { unique: true })
     name: string;
 
     @Column({
