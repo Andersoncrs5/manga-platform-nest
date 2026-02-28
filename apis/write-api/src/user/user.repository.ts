@@ -13,6 +13,10 @@ export class UserRepository extends BaseRepository<User>{
         super(userRepository);
     }
 
+    async findOneByEmail(email: string): Promise<User | null> {
+        return this.userRepository.findOne({ email } as any);
+    }
+
     async existsByEmail(email: string): Promise<boolean> {
         return this.userRepository.exists({ email } as any);
     }
