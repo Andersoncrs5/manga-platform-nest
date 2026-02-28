@@ -16,7 +16,6 @@ import {CryptoService} from "../utils/service/crypto/CryptoService";
     RoleModule,
     UserRoleModule,
     PassportModule,
-    CryptoService,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
@@ -40,9 +39,10 @@ import {CryptoService} from "../utils/service/crypto/CryptoService";
   ],
   controllers: [AuthController],
   providers: [
-      AuthService,
-      JwtStrategy,
-      ConfigService
+    AuthService,
+    JwtStrategy,
+    ConfigService,
+    CryptoService
   ],
   exports: [AuthService],
 })
