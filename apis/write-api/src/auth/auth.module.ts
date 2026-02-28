@@ -8,6 +8,7 @@ import {UserModule} from "../user/user.module";
 import {RoleModule} from "../role/role.module";
 import {UserRoleModule} from "../user-role/user-role.module";
 import {JwtStrategy} from "./strategies/jwt.strategy";
+import {CryptoService} from "../utils/service/crypto/CryptoService";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import {JwtStrategy} from "./strategies/jwt.strategy";
     RoleModule,
     UserRoleModule,
     PassportModule,
+    CryptoService,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
