@@ -126,33 +126,25 @@ export class RoleService implements OnApplicationBootstrap   {
   async findByNameSimple(name: string): Promise<Role> {
     const result = await this.roleRepository.findByName(name);
 
-    if (result == null) throw new NotFoundException("Role not found");
+    if (result == null) throw new NotFoundException(`Role with name: ${name} not found`);
 
     return result;
   }
 
   private async seedInitialRoles() {
     const roles = [
-      { name: 'SUPER_ADMIN_ROLE', description: 'Administrative System' },
-      { name: 'ADMIN_ROLE', description: 'Administrative System' },
-      { name: 'USER_ROLE', description: 'Standard User' },
-      { name: 'MODERATOR_ROLE', description: 'Standard User' },
+      { name: 'SUPER_ADMIN_ROLE', description: 'Super Administrative System', isActive: true },
+      { name: 'ADMIN_ROLE', description: 'Administrative System', isActive: true },
+      { name: 'USER_ROLE', description: 'Standard User', isActive: true },
+      { name: 'MODERATOR_ROLE', description: 'Moderator User', isActive: true },
     ];
 
-    for (const roleData of roles) {
+    try {
+      await this.roleRepository.upsertRoles(roles);
 
-      const role = new Role();
-      role.name = roleData.name;
-      role.description = roleData.description;
-
-      const exists = await this.existsByName(role.name);
-
-      if (!exists) {
-        await this.create(role);
-      }
-
-      if (exists) {
-      }
+      console.log('✅ All roles synchronized successfully (Upsert)');
+    } catch (error) {
+      console.error('❌ Error during bulk seeding:', error.message);
     }
   }
 
