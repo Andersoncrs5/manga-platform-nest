@@ -67,5 +67,9 @@ export class UserRoleService {
       throw new InternalServerErrorException('Error linking user to role.');
     }
   }
-  
+
+  async findAllByUserId(userId: string): Promise<UserRole[]> {
+    return await this.userRoleRepository.findAllByUserId(userId)
+  }
+
 }
