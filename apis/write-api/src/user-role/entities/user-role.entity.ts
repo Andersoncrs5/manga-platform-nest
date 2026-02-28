@@ -5,6 +5,7 @@ import {Role} from "../../role/entities/role.entity";
 
 @Entity('userRoles')
 @Index('idx_user_role_unique', ['userId', 'roleId'], { unique: true })
+@Index('idx_role_id', ['roleId'])
 export class UserRole extends BaseEntity {
     @Column()
     userId: string;
