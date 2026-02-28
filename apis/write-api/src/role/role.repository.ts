@@ -16,5 +16,8 @@ export class RoleRepository extends BaseRepository<Role> {
     async existsByName(name: string): Promise<boolean> {
         return this.roleRepository.exists({ name } as any);
     }
+    async findByName(name: string): Promise<Role | null> {
+        return this.roleRepository.findOne({ where: { name } } );
+    }
 
 }
