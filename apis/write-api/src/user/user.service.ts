@@ -6,6 +6,7 @@ import {User} from "./entities/user.entity";
 import {CryptoService} from "../utils/service/crypto/CryptoService";
 import {QueryFailedError} from "typeorm";
 import {UniqueConstraintViolationException} from "../utils/exceptions/classes/unique-constraint-violation.exception";
+import * as cluster from "node:cluster";
 
 @Injectable()
 export class UserService {
@@ -13,7 +14,13 @@ export class UserService {
     private readonly repository: UserRepository,
     private readonly crypto: CryptoService,
   ){}
-  
+
+  async updateRefreshToken(user: User, refreshToken: string): Promise<User> {
+    user.refreshToken = refreshToken;
+
+    return await this.repository.save(user);
+  }
+
   async create(dto: CreateUserDto): Promise<User> {
     const user = new User()
 
@@ -91,5 +98,9 @@ export class UserService {
 
   async remove(id: string) {
     await this.repository.delete(id)
+  }
+
+  async findOneByEmail(email: string): Promise<User | null > {
+    return await this.repository.findOneByEmail(email);
   }
 }
