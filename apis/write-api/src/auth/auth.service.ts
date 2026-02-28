@@ -12,6 +12,8 @@ import {Tokens} from "./class/tokens.class";
 import {CryptoService} from "../utils/service/crypto/CryptoService";
 import {LoginUserDto} from "./dto/login-user.dto";
 import {UserRole} from "../user-role/entities/user-role.entity";
+import {UserDto} from "../user/dto/user.dto";
+import {LoginResponse} from "./class/login.response";
 
 @Injectable()
 export class AuthService {
@@ -76,10 +78,13 @@ export class AuthService {
       refreshToken
     }
 
-    return {
+    const loginResponse: LoginResponse = {
+      user: UserDto.parseToDto(userUpdated),
       tokens: tokens,
-      user: userUpdated
+      roles
     }
+
+    return loginResponse
   }
 
 }
