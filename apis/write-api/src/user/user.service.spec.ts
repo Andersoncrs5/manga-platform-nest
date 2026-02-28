@@ -46,6 +46,7 @@ describe('UserService', () => {
     existsByUsername: jest.fn(),
     delete: jest.fn(),
     save: jest.fn(),
+    findOneByEmail: jest.fn(),
   };
 
   const mockCryptoService = {
@@ -282,6 +283,31 @@ describe('UserService', () => {
       expect(repository.delete).toHaveBeenCalledWith(mockUser.id);
       expect(repository.delete).toHaveBeenCalledTimes(1);
     });
+  })
+
+  describe('findOneByEmail', () => {
+    it('should return user when get by email', async () => {
+      mockUserRepository.findOneByEmail.mockResolvedValue(mockUser);
+
+      const result = await service.findOneByEmail(mockUser.id);
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe(mockUser.id);
+
+      expect(repository.findOneByEmail).toHaveBeenCalledWith(mockUser.id);
+      expect(repository.findOneByEmail).toHaveBeenCalledTimes(1);
+    })
+
+    it('should return null', async () => {
+      mockUserRepository.findOneByEmail.mockResolvedValue(null);
+
+      const result = await service.findOneByEmail(mockUser.id);
+
+      expect(result).toBeNull();
+
+      expect(repository.findOneByEmail).toHaveBeenCalledWith(mockUser.id);
+      expect(repository.findOneByEmail).toHaveBeenCalledTimes(1);
+    })
   })
 
 });
