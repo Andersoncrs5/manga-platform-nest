@@ -58,6 +58,7 @@ describe('UserRoleService', () => {
     existsByUserIdAndRoleId: jest.fn(),
     delete: jest.fn(),
     save: jest.fn(),
+    findAllByUserId: jest.fn(),
   }
 
   beforeEach(async () => {
@@ -258,6 +259,19 @@ describe('UserRoleService', () => {
       expect(repository.existsByUserIdAndRoleId).toHaveBeenCalledWith(mockUser.id, mockRole.id)
       expect(repository.existsByUserIdAndRoleId).toHaveBeenCalledTimes(1);
     });
+  })
+
+  describe('findAllByUserId', () => {
+    it('should return userRole array', async () => {
+      mockUserRoleRepository.findAllByUserId.mockResolvedValue([mockUserRole]);
+
+      const result = await service.findAllByUserId(mockUser.id);
+
+      expect(result.length).toBe(1);
+
+      expect(repository.findAllByUserId).toHaveBeenCalledWith(mockUser.id);
+      expect(repository.findAllByUserId).toHaveBeenCalledTimes(1);
+    })
   })
 
 });
