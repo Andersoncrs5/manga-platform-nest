@@ -1,23 +1,11 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, UseInterceptors} from '@nestjs/common';
+import {Controller, Body, Patch, Param, Delete} from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import {UserDto} from "./dto/user.dto";
 import {Transactional} from "typeorm-transactional";
 
-  @Controller('v1/user')
-  export class UserController {
-    constructor(private readonly userService: UserService) {}
-
-    @Post()
-    @Transactional()
-    async create(@Body() createUserDto: CreateUserDto) {
-      const userCreated = await this.userService.create(createUserDto);
-
-      const userDto: UserDto = { ...userCreated };
-
-      return userDto;
-    }
+@Controller('v1/user')
+export class UserController {
+  constructor(private readonly userService: UserService) {}
 
   @Patch(':id')
   @Transactional()
