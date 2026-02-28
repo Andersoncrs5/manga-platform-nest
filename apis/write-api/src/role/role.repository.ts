@@ -2,7 +2,7 @@ import {Injectable} from "@nestjs/common";
 import {BaseRepository} from "../utils/BaseRepository";
 import {Role} from "./entities/role.entity";
 import {InjectRepository} from "@nestjs/typeorm";
-import {Repository} from "typeorm";
+import {InsertResult, Repository} from "typeorm";
 
 @Injectable()
 export class RoleRepository extends BaseRepository<Role> {
@@ -18,6 +18,16 @@ export class RoleRepository extends BaseRepository<Role> {
     }
     async findByName(name: string): Promise<Role | null> {
         return this.roleRepository.findOne({ where: { name } } );
+    }
+
+    async upsertRoles(roles: Partial<Role>[]): Promise<InsertResult> {
+        return this.roleRepository
+            .createQueryBuilder()
+            .insert()
+            .into(Role)
+            .values(roles)
+            .orIgnore()
+            .execute();
     }
 
 }
