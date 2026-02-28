@@ -30,4 +30,9 @@ export class UserRoleRepository extends BaseRepository<UserRole> {
             }
         });
     }
+
+    async findAllByUserId(userId: string): Promise<UserRole[]> {
+        return await this.userRoleRepository.find({ where: { userId } })
+    }
+
 }
