@@ -123,6 +123,14 @@ export class RoleService implements OnApplicationBootstrap   {
     }
   }
 
+  async findByNameSimple(name: string): Promise<Role> {
+    const result = await this.roleRepository.findByName(name);
+
+    if (result == null) throw new NotFoundException("Role not found");
+
+    return result;
+  }
+
   private async seedInitialRoles() {
     const roles = [
       { name: 'SUPER_ADMIN_ROLE', description: 'Administrative System' },
