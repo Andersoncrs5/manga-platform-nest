@@ -18,5 +18,8 @@ import { UniqueUsernameValidator } from './validations/uniqueUsername.validator'
       UniqueUsernameValidator,
       CryptoService
   ],
+    exports: [
+        UserService,
+    ]
 })
 export class UserModule {}
