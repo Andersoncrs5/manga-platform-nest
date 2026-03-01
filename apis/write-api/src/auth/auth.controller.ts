@@ -6,7 +6,7 @@ import {CreateUserDto} from "../user/dto/create-user.dto";
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
+  @Post('/register')
   async createUser(@Body() dto: CreateUserDto) {
     return await this.authService.create(dto);
   }
