@@ -6,7 +6,6 @@ import {User} from "./entities/user.entity";
 import {CryptoService} from "../utils/service/crypto/CryptoService";
 import {QueryFailedError} from "typeorm";
 import {UniqueConstraintViolationException} from "../utils/exceptions/classes/unique-constraint-violation.exception";
-import * as cluster from "node:cluster";
 
 @Injectable()
 export class UserService {
@@ -15,7 +14,7 @@ export class UserService {
     private readonly crypto: CryptoService,
   ){}
 
-  async updateRefreshToken(user: User, refreshToken: string): Promise<User> {
+  async updateRefreshToken(user: User, refreshToken: string | null): Promise<User> {
     user.refreshToken = refreshToken;
 
     return await this.repository.save(user);
