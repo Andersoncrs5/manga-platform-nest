@@ -4,7 +4,7 @@ import {
     ArgumentsHost,
     HttpException,
     HttpStatus,
-    Logger,
+    Logger, UnauthorizedException,
 } from '@nestjs/common';
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { ResponseHTTP } from "../res/responseHttp.res";
@@ -16,6 +16,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     private readonly exceptionMap = new Map<any, number>([
         [UniqueConstraintViolationException, HttpStatus.BAD_REQUEST],
+        [UnauthorizedException, HttpStatus.UNAUTHORIZED],
     ]);
 
     catch(exception: unknown, host: ArgumentsHost) {
