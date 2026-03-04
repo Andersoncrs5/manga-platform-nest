@@ -38,7 +38,7 @@ export class AuthService {
     if (user == null) throw new UnauthorizedException();
 
     const result = await this.cryptoService.verifyPassword(dto.password, user.password);
-    if (result == null) throw new UnauthorizedException();
+    if (!result) throw new UnauthorizedException();
 
     const userRoles: UserRole[] = await this.userRoleService.findAllByUserId(user.id);
 
@@ -85,6 +85,10 @@ export class AuthService {
     }
 
     return loginResponse
+  }
+
+  public async logout(user: User): Promise<void> {
+    await this.userService.updateRefreshToken(user, null)
   }
 
 }
