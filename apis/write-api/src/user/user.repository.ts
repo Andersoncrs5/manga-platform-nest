@@ -1,8 +1,9 @@
-import {Injectable} from "@nestjs/common";
+import {BadRequestException, Injectable, NotFoundException} from "@nestjs/common";
 import {BaseRepository} from "../utils/BaseRepository";
 import { InjectRepository } from '@nestjs/typeorm';
 import {User} from "./entities/user.entity";
 import {Repository} from "typeorm";
+import {isEmail} from "class-validator";
 
 @Injectable()
 export class UserRepository extends BaseRepository<User>{
@@ -14,15 +15,26 @@ export class UserRepository extends BaseRepository<User>{
     }
 
     async findOneByEmail(email: string): Promise<User | null> {
-        return this.userRepository.findOne({ email } as any);
+        if (!email || !isEmail(email)) {
+            throw new BadRequestException('Invalid email format');
+        }
+        return this.userRepository.findOne({where: { email }});
     }
 
     async existsByEmail(email: string): Promise<boolean> {
-        return this.userRepository.exists({ email } as any);
+        if (!email || !isEmail(email)) {
+            throw new BadRequestException('Invalid email format');
+        }
+
+        return this.userRepository.exists({where: { email }});
     }
 
     async existsByUsername(username: string): Promise<boolean> {
-        return this.userRepository.exists({ username } as any);
+        if (!username) {
+            throw new BadRequestException('Invalid email format');
+        }
+
+        return this.userRepository.exists({where: { username }});
     }
 
 }
