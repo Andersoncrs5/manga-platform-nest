@@ -7,6 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { FastifyRequest } from 'fastify';
+import { v4 as uuidv4 } from 'uuid';
 import {ResponseHTTP} from "../res/responseHttp.res";
 
 @Injectable()
@@ -20,7 +21,7 @@ export class TransformInterceptor<T> implements NestInterceptor<T, ResponseHTTP<
                 timestamp: new Date().toISOString(),
                 path: request.url,
                 method: request.method,
-                traceId: (request.raw as any).id || 'success-trace',
+                traceId: (request.raw as any).id || uuidv4(),
                 message: 'Operação realizada com sucesso',
             })),
         );
